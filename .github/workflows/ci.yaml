@@ -1,0 +1,39 @@
+---
+"on":
+  push:
+    tags:
+      - "*"
+    branches:
+      - main
+      - release/**
+  pull_request:
+
+jobs:
+  mre:
+    runs-on: ubuntu-latest
+    steps:
+      - id: tag
+        uses: docker/metadata-action@v4
+        with:
+          images:
+            quay.io/somerepo/someimage
+      - run: |
+            echo "try 2 version:"
+            cat << EOF
+            ${{ steps.tag.outputs.version }}
+            EOF
+            echo "try 2 tags:"
+            cat << EOF
+            ${{ steps.tag.outputs.tags }}
+            EOF
+            echo "try 2 labels:"
+            cat << EOF
+            ${{ steps.tag.outputs.labels }}
+            EOF
+            echo "try 2 json:"
+            jq . << EOF
+            ${{ steps.tag.outputs.json }}
+            EOF
+            echo
+            echo "github event"
+            jq . $GITHUB_EVENT_PATH
